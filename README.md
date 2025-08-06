@@ -88,7 +88,7 @@ npm start
 
 ## 📧 Contact
 
-Your Name - (https://www.instagram.com/ahme_dfadl/)
+Ahmed Fadl - (https://www.instagram.com/ahme_dfadl/)
 
 Project Link: [https://cinema-scoop-ten.vercel.app/]
 
