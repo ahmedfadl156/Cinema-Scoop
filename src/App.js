@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import StarRating from "./StarRating";
+
 const KEY = "a1a363d";
 export default function App() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   // const [watched, setWatched] = useState([]);
@@ -47,10 +50,10 @@ export default function App() {
           const res = await fetch(
             `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`
           );
-          if (!res.ok) throw new Error("Something Went Wrong!");
+          if (!res.ok) throw new Error(t("something_went_wrong"));
           const data = await res.json();
           if (data.Response === "False")
-            throw new Error("We Coludn't Found The Movie");
+            throw new Error(t("movie_not_found"));
           setMovies(data.Search);
         } catch (err) {
           console.error(err);
@@ -140,15 +143,45 @@ function Error({ message }) {
 }
 
 function Header() {
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
   return (
     <div className="header">
-      <h1>Cinema Scoop</h1>
-      <p>Your personal movie companion</p>
+      <h1>{t('app_title')}</h1>
+      <p>{t('app_subtitle')}</p>
+      <LanguageSwitcher currentLanguage={i18n.language} onLanguageChange={changeLanguage} />
+    </div>
+  );
+}
+
+function LanguageSwitcher({ currentLanguage, onLanguageChange }) {
+  return (
+    <div className="language-switcher">
+      <button 
+        className={`lang-btn ${currentLanguage === 'en' ? 'active' : ''}`}
+        onClick={() => onLanguageChange('en')}
+      >
+        <span className="lang-flag">🇺🇸</span>
+        <span className="lang-text">English</span>
+      </button>
+      <button 
+        className={`lang-btn ${currentLanguage === 'ar' ? 'active' : ''}`}
+        onClick={() => onLanguageChange('ar')}
+      >
+        <span className="lang-flag">🇸🇦</span>
+        <span className="lang-text">العربية</span>
+      </button>
     </div>
   );
 }
 
 function SearchInput({ query, setQuery }) {
+  const { t } = useTranslation();
+  
   return (
     <form>
       <div className="search-bar">
@@ -156,18 +189,20 @@ function SearchInput({ query, setQuery }) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for a movie..."
+          placeholder={t('search_placeholder')}
         />
-        <button className="s-btn">Search</button>
+        <button className="s-btn">{t('search_button')}</button>
       </div>
     </form>
   );
 }
 
 function SearchResults({ movies, isLoading, error, onSelectMovie }) {
+  const { t } = useTranslation();
+  
   return (
     <div className="search-results-container">
-      <h2>Search Results</h2>
+      <h2>{t('search_results')}</h2>
       {isLoading && <Loader />}
       {!isLoading && !error && movies?.length > 0 ? (
         <ul className="movies-list custom-scrollbar">
@@ -180,7 +215,7 @@ function SearchResults({ movies, isLoading, error, onSelectMovie }) {
           ))}
         </ul>
       ) : (
-        <p>Start Searching For Movies To See Results</p>
+        <p>{t('start_searching')}</p>
       )}
       {error && <Error message={error} />}
     </div>
@@ -188,6 +223,8 @@ function SearchResults({ movies, isLoading, error, onSelectMovie }) {
 }
 
 function Stats({ watched }) {
+  const { t } = useTranslation();
+  
   const imdbRating =
     watched
       .map((movie) => movie.imdbRating)
@@ -204,31 +241,31 @@ function Stats({ watched }) {
       .reduce((acc, cur) => acc + cur, 0) || 0;
   return (
     <div className="stats-container">
-      <h2>Your Stats</h2>
+      <h2>{t('your_stats')}</h2>
       <div className="stats-small-containers">
         {/* First */}
         <div className="stat-container">
           <img src="movie.svg" alt="movie" />
           <span>{watched.length}</span>
-          <p>Movies</p>
+          <p>{t('movies')}</p>
         </div>
         {/* Second */}
         <div className="stat-container">
           <img src="imdbstar.svg" alt="imdbStar" />
           <span>{imdbRating}</span>
-          <p>Imdb Rating</p>
+          <p>{t('imdb_rating')}</p>
         </div>
         {/* Third */}
         <div className="stat-container">
           <img src="userstar.svg" alt="userStar" />
           <span>{userRating}</span>
-          <p>Your Rating</p>
+          <p>{t('your_rating')}</p>
         </div>
         {/* Fourth */}
         <div className="stat-container">
           <img src="minutes.svg" alt="Minutes" />
           <span>{minutes}</span>
-          <p>Minutes</p>
+          <p>{t('minutes')}</p>
         </div>
       </div>
     </div>
@@ -236,11 +273,13 @@ function Stats({ watched }) {
 }
 
 function WatchedMoviesList({ watched, onDeleteWatched }) {
+  const { t } = useTranslation();
+  
   return (
     <div className="watched-movies-container">
-      <h2>Your Watched Movies</h2>
+      <h2>{t('watched_movies')}</h2>
       {watched.length === 0 ? (
-        <p>Your Watched List Is Empty. Start Adding Movies!</p>
+        <p>{t('watched_list_empty')}</p>
       ) : (
         <ul>
           {watched.map((movie) => (
@@ -257,12 +296,14 @@ function WatchedMoviesList({ watched, onDeleteWatched }) {
 }
 
 function WatchedMovie({ movie, onDeleteWatched }) {
+  const { t } = useTranslation();
+  
   return (
     <li className="watched-movie-container">
       <img src={movie.poster} alt={movie.title} />
       <div className="watched-movie-info">
         <h2>{movie.title}</h2>
-        <span className="rate" style={{fontSize: "14px"}}>{movie.imdbRating > 8 ? "High Rated" : ""}</span>
+        <span className="rate" style={{fontSize: "14px"}}>{movie.imdbRating > 8 ? t('high_rated') : ""}</span>
         <p>{movie.year}</p>
         <div className="runtime-info">
           <span>⭐ {movie.imdbRating}</span>
@@ -293,6 +334,7 @@ function Movie({ movie, onSelectMovie }) {
 }
 
 function MovieDetails({ selectedId, onCloseMovie, onAddToWatched, watched }) {
+  const { t } = useTranslation();
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState(null);
@@ -373,21 +415,21 @@ function MovieDetails({ selectedId, onCloseMovie, onAddToWatched, watched }) {
           >
             IMDB
           </a>
-          <span className="rate" style={{fontSize: "14px" , fontWeight: "bold"}}>{isHighRated ? "High Rated" : ""}</span>
+          <span className="rate" style={{fontSize: "14px" , fontWeight: "bold"}}>{isHighRated ? t('high_rated') : ""}</span>
         </div>
         <p className="summary">{movie.Plot}</p>
-        <p>Starring: {movie.Actors} </p>
-        <p>Directed By: {movie.Director} </p>
+        <p>{t('starring')}: {movie.Actors} </p>
+        <p>{t('directed_by')}: {movie.Director} </p>
       </div>
       <div className="star-rating-container">
         {isWatched ? (
-          <p>You Rated This Movie {watchedUserRating}⭐</p>
+          <p>{t('you_rated_this')} {watchedUserRating}⭐</p>
         ) : (
           <>
             <StarRating maxRating={10} onSetRating={handleRating} />
             {userRating > 0 && (
               <button className="addWatched-btn" onClick={handleAdd}>
-                + Add to Watched
+                {t('add_to_watched')}
               </button>
             )}
           </>
@@ -398,13 +440,15 @@ function MovieDetails({ selectedId, onCloseMovie, onAddToWatched, watched }) {
 }
 
 function Footer(){
+  const { t } = useTranslation();
+  
   return(
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-main">
                 <div class="developer-info">
-                    <span class="developer-label">Developed by</span>
-                    <span class="developer-name">Ahmed Fadl</span>
+                    <span class="developer-label">{t('developed_by')}</span>
+                    <span class="developer-name">{t('dev-name')}</span>
                 </div>
                 
                 <div class="social-links">
@@ -431,9 +475,10 @@ function Footer(){
             <div class="footer-divider"></div>
             
             <div class="footer-copyright">
-                © 2025 Cinema Scoop. All rights reserved.
+                {t('all_rights_reserved')}
             </div>
         </div>
     </footer>
   );
 }
+
