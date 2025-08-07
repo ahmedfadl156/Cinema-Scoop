@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
+import { initReactI18next } from 'react-i18next';
 import StarRating from "./StarRating";
 
 const KEY = "a1a363d";
