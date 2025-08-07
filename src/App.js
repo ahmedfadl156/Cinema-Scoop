@@ -253,13 +253,13 @@ function Stats({ watched }) {
         {/* Second */}
         <div className="stat-container">
           <img src="imdbstar.svg" alt="imdbStar" />
-          <span>{imdbRating}</span>
+          <span>{imdbRating.toFixed(2)}</span>
           <p>{t('imdb_rating')}</p>
         </div>
         {/* Third */}
         <div className="stat-container">
           <img src="userstar.svg" alt="userStar" />
-          <span>{userRating}</span>
+          <span>{userRating.toFixed(2)}</span>
           <p>{t('your_rating')}</p>
         </div>
         {/* Fourth */}
