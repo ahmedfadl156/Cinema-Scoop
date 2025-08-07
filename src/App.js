@@ -4,7 +4,11 @@ const KEY = "a1a363d";
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
+  // const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useState(function(){
+    const storedMovies = localStorage.getItem('watched');
+    if(storedMovies) return JSON.parse(storedMovies)
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
@@ -25,6 +29,10 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
+
+  useEffect(function(){
+    localStorage.setItem('watched' , JSON.stringify(watched))
+  }, [watched])
 
   useEffect(
     function () {
@@ -249,6 +257,7 @@ function WatchedMovie({ movie, onDeleteWatched }) {
       <img src={movie.poster} alt={movie.title} />
       <div className="watched-movie-info">
         <h2>{movie.title}</h2>
+        <span className="rate" style={{fontSize: "14px"}}>{movie.imdbRating > 8 ? "High Rated" : ""}</span>
         <p>{movie.year}</p>
         <div className="runtime-info">
           <span>⭐ {movie.imdbRating}</span>
@@ -283,7 +292,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddToWatched, watched }) {
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState(null);
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
-
+  const isHighRated = movie.imdbRating > 8;
   function handleAdd() {
     const newWatchedMovie = {
       imdbID: selectedId,
@@ -359,6 +368,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddToWatched, watched }) {
           >
             IMDB
           </a>
+          <span className="rate" style={{fontSize: "14px" , fontWeight: "bold"}}>{isHighRated ? "High Rated" : ""}</span>
         </div>
         <p className="summary">{movie.Plot}</p>
         <p>Starring: {movie.Actors} </p>
